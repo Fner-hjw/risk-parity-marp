@@ -9,9 +9,9 @@ results = run_backtest(
     lookback=756,       # 3 years × 252 trading days
     rebal_days=252,     # rebalance annually
     strategies={
-        "ERC_10": lambda r, m: allocate_erc(r, vol_target=0.10),
-        "RP_10":  lambda r, m: allocate_vol_target(r, vol_target=0.10),
-        "Equal":  lambda r, m: allocate_equal_weight(r),
+        "ERC_5":   lambda r, m: allocate_erc(r, vol_target=0.05),
+        "RP_5":    lambda r, m: allocate_vol_target(r, vol_target=0.05),
+        "Equal":   lambda r, m: allocate_equal_weight(r),
         "MARP_rep": lambda r, m: allocate_marp_replication(r, m, method="ridge"),
     },
 )
@@ -237,7 +237,7 @@ def run_backtest(
 
 def _default_strategies() -> dict[str, Callable]:
     return {
-        "ERC_10":     lambda r, m: allocate_erc(r, vol_target=0.10),
+        "ERC_5":      lambda r, m: allocate_erc(r, vol_target=0.05),
         "Equal":      lambda r, m: allocate_equal_weight(r),
         "MARP_rep":   lambda r, m: allocate_marp_replication(r, m, method="ridge") if m is not None else allocate_equal_weight(r),
     }

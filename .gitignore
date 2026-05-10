@@ -13,3 +13,5 @@ __pycache__/
 # OS
 .DS_Store
 risk-parity-marp/reports/build-docx.js 21-02-52-095.js
+risk-parity-marp/reports/report.docx
+risk-parity-marp/reports/report.pdf

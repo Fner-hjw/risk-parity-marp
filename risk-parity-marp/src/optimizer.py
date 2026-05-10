@@ -25,7 +25,6 @@ from scipy.cluster.hierarchy import linkage as _linkage, leaves_list
 from scipy.optimize import minimize
 from scipy.spatial.distance import squareform
 
-
 # --------------------------------------------------------------------------
 # Helpers
 # --------------------------------------------------------------------------
@@ -138,14 +137,22 @@ def allocate_marp_replication(
         coef = np.linalg.solve(K, X.T @ y)
 
     elif method == "constrained":
-        from scipy.optimize import lsq_linear
+        # Long-only sum-to-1 replication via SLSQP (lsq_linear has no equality constraint support).
+        n_assets = X.shape[1]
 
-        res = lsq_linear(
-            X, y,
-            bounds=(0, np.inf),
-            constraints={"type": "eq", "fun": lambda w: np.sum(w) - 1},
+        def _obj(w):
+            r = X @ w - y
+            return float(r @ r)
+
+        sol = minimize(
+            _obj,
+            np.ones(n_assets) / n_assets,
+            method="SLSQP",
+            bounds=[(0.0, 1.0) for _ in range(n_assets)],
+            constraints=[{"type": "eq", "fun": lambda w: np.sum(w) - 1.0}],
+            options={"maxiter": 2000, "ftol": 1e-12},
         )
-        coef = res.x
+        coef = sol.x
 
     else:
         raise ValueError(f"Unknown method: {method!r}")
