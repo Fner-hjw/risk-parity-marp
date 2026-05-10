@@ -2,14 +2,14 @@ const fs = require("fs");
 const path = require("path");
 const {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-  Header, Footer, AlignmentType, LevelFormat, ImageRun,
+  Header, Footer, AlignmentType, ImageRun,
   HeadingLevel, BorderStyle, WidthType, ShadingType,
   PageNumber,
 } = require("docx");
 
-// ── Layout constants ─────────────────────────────────────────────
+// Layout constants
 const A4_W = 11906;
-const MARGIN = 1080; // 0.75" — tighter to fit 10 pages
+const MARGIN = 1080; // 0.75"
 const CONTENT_W = A4_W - 2 * MARGIN;
 
 const FONT = "Times New Roman";
@@ -26,7 +26,7 @@ const HEADER_BG = "1F3A5F";
 const ROW_ALT = "F2F4F7";
 const BORDER_COLOR = "9CA3AF";
 
-// ── Paragraph helpers ────────────────────────────────────────────
+// Paragraph helpers
 function run(text, opts = {}) {
   return new TextRun({
     text,
@@ -89,7 +89,7 @@ function eqLine(text) {
   });
 }
 
-// ── Table builder ────────────────────────────────────────────────
+// Table builder
 function makeTable(headers, rows, colWidths) {
   const border = { style: BorderStyle.SINGLE, size: 1, color: BORDER_COLOR };
   const borders = { top: border, bottom: border, left: border, right: border };
@@ -134,7 +134,7 @@ function tableTitle(text) {
   return para(text, { bold: true, size: BODY_TABLE, after: 40, before: 60 });
 }
 
-// ── Image helper ─────────────────────────────────────────────────
+// Image helper
 function image(filePath, widthPx, heightPx) {
   const data = fs.readFileSync(filePath);
   return new Paragraph({
@@ -147,7 +147,7 @@ function image(filePath, widthPx, heightPx) {
   });
 }
 
-// ── Document ─────────────────────────────────────────────────────
+// Document
 const REPORTS_DIR = path.dirname(__filename);
 const FIG_CUM = path.join(REPORTS_DIR, "figures", "test_cumulative.png");
 const FIG_DD = path.join(REPORTS_DIR, "figures", "test_drawdown.png");
@@ -178,7 +178,7 @@ const doc = new Document({
           spacing: { after: 60 },
           alignment: AlignmentType.RIGHT,
           children: [new TextRun({
-            text: "Tradable Multi-Asset Risk Parity — Fudan AIS 2026",
+            text: "Tradable Multi-Asset Risk Parity, Fudan AIS 2026",
             font: FONT, size: 14, italics: true, color: "555555",
           })],
         })],
@@ -199,12 +199,12 @@ const doc = new Document({
       }),
     },
     children: [
-      // ── Title block ───────────────────────────────────────────
+      // Title block
       para("A Tradable Multi-Asset Risk Parity Strategy",
         { size: TITLE_SZ, bold: true, align: AlignmentType.CENTER, after: 60, before: 0 }),
-      para("Replicating CSI MARP 930929 and Benchmarking Against Hedge Fund Replication",
+      para("Replicating CSI MARP 930929",
         { size: SUB_SZ, italics: true, align: AlignmentType.CENTER, after: 60 }),
-      para("Fudan University — Alternative Investment Strategies, Prof. Sun Lin — May 2026",
+      para("Fudan University, Alternative Investment Strategies, Prof. Sun Lin, May 2026",
         { size: BODY, align: AlignmentType.CENTER, after: 0 }),
       new Paragraph({
         spacing: { before: 100, after: 100 },
@@ -212,21 +212,21 @@ const doc = new Document({
         children: [],
       }),
 
-      // ── Abstract ──────────────────────────────────────────────
+      // Abstract
       h1("Abstract"),
-      justified("The CSI Multi-Asset Risk Parity Index (930929) provides a transparent reference for diversified Chinese multi-asset investing but is not directly tradable. We construct a tradable proxy from five liquid onshore ETFs spanning equity, fixed income, and commodity asset classes, and we evaluate four allocation rules — Equal Risk Contribution (ERC), inverse-volatility risk parity, Hierarchical Risk Parity (HRP), and a ridge-regression replication of the official index — under a strict walk-forward protocol with the post-2021 data locked. Out-of-sample (2022–2025), the ERC portfolio with a 5% volatility overlay delivers an annualised return of 8.94% at 5.24% realised volatility, a Sharpe ratio of 1.28, and a maximum drawdown of −4.93%, halving the drawdown of an equal-weight benchmark while improving risk-adjusted performance. A factor decomposition shows that returns are not levered equity exposure (market β ≈ 0.35); a regime split confirms asymmetric protection in the 2022 bear market; and a gold-ablation test reveals that removing the gold leg degrades the Sharpe ratio by 0.95, identifying gold as the single largest contributor to risk-adjusted performance. We compare these results against a Hasanhodzic–Lo factor-replication portfolio and find the two approaches capture distinct premia (return correlation 0.62), suggesting they are complementary rather than substitutable."),
+      justified("The CSI Multi-Asset Risk Parity Index (930929) provides a transparent reference for diversified Chinese multi-asset investing but is not directly tradable. We construct a tradable proxy from five liquid onshore ETFs spanning equity, fixed income, and commodity asset classes, and we evaluate four allocation rules, Equal Risk Contribution (ERC), inverse-volatility risk parity, Hierarchical Risk Parity (HRP), and a ridge-regression replication of the official index, under a strict walk-forward protocol with the post-2021 data locked. Out-of-sample (Dec 2022–Dec 2025), the ERC portfolio with a 5% volatility overlay delivers an annualised return of 6.74% at 2.56% realised volatility (the unlevered constraint binds well below the 5% target), a Sharpe ratio of 1.77, and a maximum drawdown of −1.63%, cutting the drawdown of an equal-weight benchmark by more than 80% while improving risk-adjusted performance. A factor decomposition shows that returns are not levered equity exposure (market β ≈ 0.09); a regime split confirms asymmetric protection across the 2023 sideways and 2024 rally regimes; and a gold-ablation test reveals that removing the gold leg degrades the Sharpe ratio by 0.76, showing that the gold leg is a material contributor to risk-adjusted performance."),
 
-      // ── 1. Introduction ───────────────────────────────────────
+      // 1. Introduction
       h1("1. Introduction"),
       justified("The China Securities Index Multi-Asset Risk Parity Index (CSI MARP, code 930929), launched in January 2017, allocates risk budgets equally across equity, fixed income, and commodity sleeves. While the index has become a standard reference for multi-asset balance, its constituents include institutional fixed-income instruments and over-the-counter commodity exposures that retail and smaller institutional investors cannot access. This raises a practical question that this study addresses: can the diversification properties of CSI MARP be reproduced using liquid exchange-traded funds, and do those properties survive out-of-sample?"),
-      justified("We answer this question in three parts. First, we construct a five-ETF universe and apply the Equal Risk Contribution algorithm of Maillard, Roncalli & Teïletche (2010) under a 5% volatility overlay matching the official index. Second, we extend the analysis along three dimensions that test the robustness of the conclusion: (i) Hierarchical Risk Parity (López de Prado 2016) as an estimation-error robust alternative; (ii) a factor-mimicking hedge-fund replicator following Hasanhodzic & Lo (2007), benchmarked against the risk parity portfolio; and (iii) an ablation of the gold sleeve, which directly addresses the project brief's question on whether gold remains a useful portfolio asset. Third, we decompose the realised performance using both a factor regression and a regime split of the out-of-sample window."),
-      justified("The remainder of the report is organised as follows. Section 2 describes the data and the construction methodology. Section 3 reports the headline backtest. Section 4 conducts factor and regime analyses. Section 5 contrasts our risk-parity allocation with factor-based hedge-fund replication. Section 6 presents three robustness exercises. Section 7 discusses limitations, and Section 8 concludes."),
+      justified("We answer this question in three parts. First, we construct a five-ETF universe and apply the Equal Risk Contribution algorithm of Maillard, Roncalli & Teïletche (2010) under a 5% volatility overlay. Second, we extend the analysis along two dimensions that test the robustness of the conclusion: (i) Hierarchical Risk Parity (López de Prado 2016) as an estimation-error robust alternative; and (ii) an ablation of the gold sleeve, which directly addresses the project brief's question on whether gold remains a useful portfolio asset. Third, we decompose the realised performance using both a factor regression and a regime split of the out-of-sample window."),
+      justified("The remainder of the report is organised as follows. Section 2 describes the data and the construction methodology. Section 3 reports the headline backtest. Section 4 conducts factor and regime analyses. Section 5 presents three robustness exercises. Section 6 discusses limitations, and Section 7 concludes."),
 
-      // ── 2. Data and Methodology ───────────────────────────────
+      // 2. Data and Methodology
       h1("2. Data and Methodology"),
       h2("2.1 Tradable Universe and Sample"),
       justified("We select five Shanghai/Shenzhen-listed ETFs that span the asset classes of CSI MARP while satisfying daily liquidity and full-sample availability constraints. The asset universe is reported in Table 1."),
-      tableTitle("Table 1 — Tradable asset universe."),
+      tableTitle("Table 1: Tradable asset universe."),
       makeTable(
         ["Ticker", "Name", "Asset class", "Inception"],
         [
@@ -239,23 +239,24 @@ const doc = new Document({
         [1500, 4200, 3000, 1746]
       ),
       para("", { after: 80 }),
-      justified("The sample is partitioned into a five-year in-sample window (2017-01-03 to 2021-12-31, 1,215 trading days) used for parameter selection and a four-year out-of-sample (OOS) window (2022-01-04 to 2025-12-31, 972 trading days) used exclusively for evaluation. The OOS data is stored in a locked subdirectory and never accessed during weight estimation, hyperparameter selection, or strategy specification, eliminating look-ahead bias by construction. Adjusted close prices for the ETFs are sourced from Yahoo Finance, the official CSI MARP and CSI 300 levels are sourced from China Securities Index Co. via the AkShare API, and a flat 2.2% per annum is used as the risk-free rate, approximating the average one-year deposit rate over the sample."),
+      justified("The sample is partitioned into a five-year in-sample window (2017-01-03 to 2021-12-31, 1,221 trading days) used to characterise asset behaviour. All allocation hyperparameters (lookback, rebalance frequency, volatility target) are set a priori rather than tuned in-sample. The out-of-sample (OOS) window begins 2022-01-01. The OOS data is stored in a locked subdirectory and never accessed during weight estimation, hyperparameter selection, or strategy specification, eliminating look-ahead bias by construction. The broad commodity ETF (159980) only began trading 2019-10-25; combined with the 756-day (≈ three-year) lookback, this means the engine produces its first valid out-of-sample rebalance on 2022-12-05, so the realised OOS coverage is roughly three years (Dec 2022 to Dec 2025) rather than the full four-year window. Adjusted close prices for the ETFs are sourced from Yahoo Finance, the official CSI MARP and CSI 300 levels are sourced from China Securities Index Co. via the AkShare API, and a flat 2.2% per annum is used as the risk-free rate, approximating the average one-year deposit rate over the sample."),
 
       h2("2.2 In-Sample Asset Statistics"),
-      justified("Table 2 reports the asset characteristics that shape the optimisation. The cross-asset correlation structure is the foundation on which risk parity operates: the equity pair is highly correlated (ρ = 0.82), bonds are essentially uncorrelated with equities (ρ = 0.05), and gold sits between these two extremes (ρ = 0.15 with equity, 0.08 with bonds)."),
-      tableTitle("Table 2 — In-sample asset statistics, 2017–2021."),
+      justified("Table 2 reports the asset characteristics that shape the optimisation. The cross-asset correlation structure is the foundation on which risk parity operates: the equity pair is highly correlated (ρ = 0.82); equities are negatively correlated with the bond ETF (ρ ≈ −0.22), confirming bonds as a diversifier; equities are essentially uncorrelated with gold (ρ ≈ 0.00); and gold–bond shows mild positive correlation (ρ ≈ 0.17)."),
+      tableTitle("Table 2: In-sample asset statistics, 2017–2021."),
       makeTable(
         ["Asset", "Ann. return", "Ann. vol", "Sharpe", "Max drawdown"],
         [
-          ["CSI 300", "8.2%", "19.3%", "0.31", "−32.5%"],
-          ["CSI 500", "5.1%", "22.1%", "0.14", "−38.7%"],
-          ["5Y Treasury", "4.1%", "1.8%", "1.06", "−2.1%"],
-          ["Gold", "8.7%", "13.2%", "0.49", "−21.3%"],
-          ["Commodity", "6.3%", "14.8%", "0.29", "−25.1%"],
+          ["CSI 300 (510300)", "10.0%", "19.5%", "0.40", "−31.3%"],
+          ["CSI 500 (510500)", "4.7%", "21.1%", "0.12", "−39.2%"],
+          ["5Y Treasury (511010)", "2.8%", "2.4%", "0.25", "−4.9%"],
+          ["Gold (518880)", "7.0%", "12.6%", "0.38", "−20.5%"],
+          ["Commodity (159980)", "20.7%", "15.4%", "1.20", "−22.4%"],
         ],
-        [2200, 1700, 1700, 1700, 3146]
+        [2700, 1700, 1700, 1500, 2746]
       ),
-      para("", { after: 80 }),
+      para("159980 IS coverage starts 2019-10-25 due to inception.",
+        { italics: true, size: SMALL, color: "555555", after: 80 }),
 
       h2("2.3 Allocation Rules"),
       justified("We implement four allocation rules, all under a long-only, unlevered constraint (Σ wᵢ ≤ 1) with any residual held in cash."),
@@ -264,10 +265,10 @@ const doc = new Document({
         { text: "Following Maillard, Roncalli & Teïletche (2010), we solve for weights such that each asset contributes equally to portfolio variance," },
       ]),
       eqLine("RCᵢ = wᵢ · (Σw)ᵢ / √(wᵀ Σ w) = 1/N,"),
-      justified("via SLSQP minimisation of the squared deviation of risk contributions from their mean, subject to non-negativity. To match the 5% annualised volatility target of CSI MARP, the resulting weights are scaled by σ_target/σ_port. When the natural ERC volatility exceeds 5%, scaling shrinks the risk-asset weight and the residual is held at the risk-free rate; when it is below 5%, the unlevered constraint binds and the portfolio operates at its natural volatility."),
+      justified("via SLSQP minimisation of the squared deviation of risk contributions from their mean, subject to non-negativity. The resulting weights are then scaled by σ_target/σ_port to a 5% annualised volatility target. We adopt 5% as a moderate, comparable target for a multi-asset balanced portfolio; the official CSI MARP index actually realises a much lower volatility (≈ 1.5% per annum, see Section 3), possibly because the underlying institutional fixed-income constituents are less volatile than the listed bond ETF used here, a definitive answer would require the published CSI methodology document. When the natural ERC volatility on this universe exceeds 5%, scaling shrinks the risk-asset weight and the residual is held at the risk-free rate; when it is below 5%, the unlevered constraint binds and the portfolio operates at its natural volatility."),
       justified([
         { text: "Inverse-Volatility Risk Parity (RP). ", bold: true },
-        { text: "A simpler heuristic — wᵢ ∝ 1/σᵢ — followed by the same volatility-target rescaling. This rule ignores correlations and provides a baseline against which the full ERC optimisation can be evaluated." },
+        { text: "A simpler heuristic, wᵢ ∝ 1/σᵢ, followed by the same volatility-target rescaling. This rule ignores correlations and provides a baseline against which the full ERC optimisation can be evaluated." },
       ]),
       justified([
         { text: "Hierarchical Risk Parity (HRP). ", bold: true },
@@ -281,162 +282,144 @@ const doc = new Document({
       justified("with the resulting weights clipped to non-negativity and renormalised. This produces a tradable approximation of the official index from the same five-ETF universe."),
 
       h2("2.4 Walk-Forward Protocol"),
-      justified("All strategies are evaluated under an identical walk-forward protocol. At each rebalance the previous 756 trading days (≈ three years) are used to estimate inputs and compute weights; the resulting allocation is held for the next 252 trading days; transactions incur 10 bps round-trip costs and 2 bps slippage; if optimisation fails (insufficient assets, singular covariance, non-convergence), the engine falls back to equal weight. The first OOS rebalance occurs on 2022-01-04 and the final on 2024-12-31."),
+      justified("All strategies are evaluated under an identical walk-forward protocol. At each rebalance the previous 756 trading days (≈ three years) are used to estimate inputs and compute weights; the resulting allocation is held for the next 252 trading days (annual rebalance); if optimisation fails (insufficient assets, singular covariance, non-convergence), the engine falls back to equal weight. Because the broad commodity ETF (159980) only became tradable in late 2019, the first lookback window with all five assets present begins in late 2019 and the first valid OOS rebalance therefore lands on 2022-12-05; subsequent rebalances follow at 252-trading-day intervals through the end of the sample (2025-12-31). The base engine reports gross-of-cost performance; transaction-cost sensitivity is examined separately in Section 5.3. In the realised OOS window only two rebalances fire, 2022-12-05 and 2023-12-15, because the engine excludes any rebalance that lacks a full 252-day forward window. The second set of weights therefore applies for roughly two years, until the end of the sample."),
 
-      // ── 3. Empirical Results ─────────────────────────────────
+      // 3. Empirical Results
       h1("3. Empirical Results"),
-      h2("3.1 Out-of-Sample Performance, 2022–2025"),
-      justified("Table 3 summarises the OOS performance of the four strategies, the equal-weight benchmark, and the official CSI MARP index. All Sharpe ratios use the 2.2% per annum risk-free rate."),
-      tableTitle("Table 3 — Out-of-sample performance, 2022-01 to 2025-12."),
+      h2("3.1 Out-of-Sample Performance"),
+      justified("Table 3 summarises the OOS performance (Dec 2022 to Dec 2025) of the four strategies, the equal-weight benchmark, and the official CSI MARP index. All Sharpe ratios use the 2.2% per annum risk-free rate. Headline metrics are reported gross of transaction costs; Section 5.3 documents the cost sensitivity."),
+      tableTitle("Table 3: Out-of-sample performance, 2022-12 to 2025-12 (gross of costs)."),
       makeTable(
         ["Strategy", "Ann. return", "Ann. vol", "Sharpe", "Sortino", "Calmar", "Max DD"],
         [
-          ["ERC (5% target)", "8.94%", "5.24%", "1.28", "1.63", "1.81", "−4.93%"],
+          ["ERC (5% target)", "6.74%", "2.56%", "1.77", "2.39", "4.13", "−1.63%"],
           ["Inverse-vol RP", "7.37%", "3.18%", "1.63", "2.17", "3.40", "−2.17%"],
           ["HRP", "4.03%", "1.45%", "1.26", "1.76", "3.12", "−1.29%"],
           ["Equal weight", "12.86%", "9.08%", "1.17", "1.53", "1.34", "−9.63%"],
           ["MARP replication", "18.48%", "9.07%", "1.80", "2.29", "3.67", "−5.04%"],
-          ["CSI MARP (official)", "5.20%", "1.51%", "1.99", "—", "—", "—"],
+          ["CSI MARP (official)", "6.27%", "1.56%", "2.61", "-", "-", "−1.08%"],
         ],
         [2400, 1300, 1100, 1000, 1100, 1100, 1346]
       ),
       para("", { after: 80 }),
-      justified("Three observations follow. First, ERC achieves a 1.28 Sharpe at a realised volatility of 5.24%, almost exactly matching the 5% target — a direct verification that the volatility-overlay machinery operates as designed. The portfolio holds approximately 42% in cash on average; this is the consequence of the unlevered constraint, since the natural ERC volatility on the five-asset universe exceeds 5% throughout the OOS period. Second, ERC dominates equal weight on every risk-adjusted metric — the Sharpe is 0.11 higher and the maximum drawdown is roughly half. Third, the ridge-based MARP replication delivers the highest absolute Sharpe (1.80) but at a volatility of 9% it is not in fact a 5%-volatility product; it tracks the shape of the official index well while operating at the natural unlevered volatility of the constituents. The official CSI MARP figures are reported for completeness but use a different (likely modestly levered) construction that lies outside the unlevered tradable framework."),
-      justified("The inverse-volatility and HRP strategies both record higher Sharpe ratios than ERC but are constrained by their natural volatilities (3.18% and 1.45% respectively), which the unlevered framework cannot scale up to the 5% target. HRP's 1.45% volatility is the consequence of Ward-linkage clustering concentrating capital in the low-volatility bond cluster — a known sensitivity discussed in §6.3."),
+      justified("Three observations follow. First, the converged ERC weights concentrate roughly three-quarters in the bond ETF (e.g. 0.06/0.05/0.73/0.08/0.08 at 2022-12-05), as required to equalise risk contributions across assets with bond volatility ≈ 2% and equity volatility ≈ 20%. The natural unlevered ERC volatility on this universe is ≈ 2.5–3.4%, so the 5% target is never reached, the unlevered constraint binds and the portfolio is fully invested in risky assets (no cash leg). Second, ERC delivers a Sharpe of 1.77 versus equal weight's 1.17, with the maximum drawdown shrinking from −9.6% to −1.6%; the price of this risk-adjusted improvement is forgone absolute return, since ERC participates in only a fraction of the equal-weight upside. Third, the ridge-based MARP replication delivers the highest absolute Sharpe (1.80) but at a volatility of 9% it is not in fact a 5%-volatility product; it operates at the natural unlevered volatility of the constituents rather than at the official index's much lower realised volatility. The official CSI MARP figures are reported for completeness but realise only ≈ 1.5% volatility on average, well below any tradable target achievable on this ETF universe, possibly because the underlying institutional fixed-income constituents are less volatile than the listed bond ETF; a definitive answer requires the published methodology document."),
+      justified("The inverse-volatility and HRP strategies record realised volatilities of 3.18% and 1.45% respectively, both below the 5% target, the unlevered framework cannot scale them up. ERC, despite operating at 2.56% rather than 5%, posts a higher Sharpe than RP and HRP. HRP's 1.45% volatility is the consequence of Ward-linkage clustering concentrating capital in the low-volatility bond cluster, a known sensitivity discussed in Section 5.3."),
 
       h2("3.2 Cumulative Performance and Annual Decomposition"),
-      justified("Figure 1 plots the OOS cumulative growth of one yuan invested in each strategy, alongside the official CSI MARP index. The visual story is consistent with Table 3: ERC tracks a path between the more aggressive equal-weight and MARP replication portfolios and the very conservative HRP and inverse-volatility paths, with the smoothest profile of any 5%-target strategy."),
+      justified("Figure 1 plots the OOS cumulative growth of one yuan invested in each strategy, alongside the official CSI MARP index. The visual story is consistent with Table 3: ERC tracks the most conservative path among the four ETF strategies (apart from HRP), reflecting its bond-heavy composition, while equal-weight and MARP replication deliver the steepest cumulative trajectories at the cost of much larger drawdowns."),
       image(FIG_CUM, 470, 232),
-      caption("Figure 1 — Cumulative out-of-sample performance, 2022–2025."),
-      justified("The annual decomposition (Table 4) makes the behaviour over the cycle explicit. In 2022, when CSI 300 fell roughly 21%, ERC lost only 1.6% — a draw that is materially smaller than the equal-weight portfolio (−6.1%) and very close to the official CSI MARP. In the 2024 rally, ERC participated for 6.2%, less than half of equal weight, reflecting the cash buffer required by the volatility overlay."),
-      tableTitle("Table 4 — Annual returns by strategy."),
+      caption("Figure 1: Cumulative out-of-sample performance, Dec 2022–Dec 2025."),
+      justified("The annual decomposition (Table 4) makes the behaviour over the cycle explicit. The 2022 row is omitted because the engine has no portfolio returns prior to its first valid OOS rebalance on 2022-12-05. In the 2024 rally, ERC returned 8.7%, well below equal weight's 13.6%, reflecting the bond-heavy allocation; the participation gap is even larger in 2025 (8.6% vs 26.5%)."),
+      tableTitle("Table 4: Annual total returns by strategy."),
       makeTable(
         ["Year", "ERC (5%)", "Equal weight", "MARP rep", "CSI MARP"],
         [
-          ["2022", "−1.6%", "−6.1%", "−0.1%", "−1.5%"],
-          ["2023", "2.8%", "5.3%", "4.8%", "2.3%"],
-          ["2024", "6.2%", "14.2%", "15.1%", "6.8%"],
-          ["2025", "7.1%", "12.8%", "16.7%", "7.2%"],
+          ["2023", "2.7%", "0.0%", "5.4%", "5.3%"],
+          ["2024", "8.7%", "13.6%", "18.8%", "8.3%"],
+          ["2025", "8.6%", "26.5%", "32.6%", "5.4%"],
         ],
         [1500, 1900, 2100, 1900, 1846]
       ),
       para("", { after: 80 }),
 
-      // ── 4. Factor and Regime Analysis ─────────────────────────
+      // 4. Factor and Regime Analysis
       h1("4. Factor and Regime Analysis"),
       h2("4.1 Factor Decomposition"),
-      justified("To establish whether the OOS performance reflects genuine diversification or merely a hidden equity tilt, we regress daily strategy returns on two tradable factors constructed from the same universe: the market excess return (CSI 300 minus the risk-free rate) and a size-style proxy (CSI 500 minus CSI 300). A value factor is unavailable from this ETF universe and is omitted; this limitation is revisited in §7. Table 5 reports the OLS estimates over the OOS window with t-statistics."),
-      tableTitle("Table 5 — Factor regression on out-of-sample returns."),
+      justified("To establish whether the OOS performance reflects genuine diversification or merely a hidden equity tilt, we regress daily strategy returns on two tradable factors constructed from the same universe: the market excess return (CSI 300 minus the risk-free rate) and a size-style proxy (CSI 500 ETF minus CSI 300 ETF). A value factor is unavailable from this ETF universe and is omitted; this limitation is revisited in Section 6. Table 5 reports the OLS estimates over the OOS window with t-statistics."),
+      tableTitle("Table 5: Factor regression on out-of-sample returns."),
       makeTable(
         ["Strategy", "α (annualised)", "β_mkt", "β_smb", "R²"],
         [
-          ["ERC (5%)", "5.2% (3.8)", "0.35 (8.4)", "0.19 (3.1)", "0.76"],
-          ["Equal weight", "3.8% (2.7)", "0.52 (10.2)", "−0.05 (−0.9)", "0.55"],
-          ["MARP replication", "6.1% (3.4)", "0.41 (7.6)", "−0.03 (−0.4)", "0.42"],
+          ["ERC (5%)", "3.8% (3.4)", "0.09 (22.2)", "0.03 (5.0)", "0.43"],
+          ["Equal weight", "7.4% (3.2)", "0.45 (51.3)", "0.21 (15.1)", "0.81"],
+          ["MARP replication", "12.9% (3.5)", "0.37 (26.8)", "0.13 (6.1)", "0.52"],
         ],
         [2600, 2300, 2200, 2200, 1846]
       ),
       para("", { after: 80 }),
-      justified("t-statistics in parentheses. ERC's market beta of 0.35 is materially below the equal-weight value of 0.52, confirming that the bond, gold, and cash legs deliver real equity-risk diversification. The annualised alpha of 5.2% is significant at the 1% level; we caveat, however, that part of this alpha mechanically reflects the cash leg earning the risk-free rate while the regression contains no cash factor. The R² of 0.76 indicates that the two-factor model captures most of the systematic variation, with the unexplained residual concentrated in bond and commodity beta."),
+      justified("t-statistics in parentheses. Because the strategies and the factor proxies are both built from the same five-ETF universe, the regressions are close to mechanical decompositions and the t-statistics are correspondingly large; they should be read as indicators of consistency rather than as classical inference. ERC's market beta of 0.09 is materially below the equal-weight value of 0.45, confirming that the bond and gold legs deliver real equity-risk diversification. The annualised alpha of 3.8% reflects all return contributions not captured by the two-factor model, bonds, gold, and commodity, rather than skill. With only equity-mkt and a size proxy on the right-hand side, every non-equity return source mechanically loads on alpha, and for ERC the bond leg dominates that residual. The R² of 0.43 is correspondingly low: only a minority of ERC's variance is explained by the equity factors, consistent with its bond-heavy composition."),
 
       h2("4.2 Regime Decomposition"),
-      justified("Table 6 splits the OOS window into five distinct regimes defined by CSI 300 price action. The regime split makes the asymmetric protection thesis testable directly. During the 2022 sell-off, ERC drew down 2.0% against the equal-weight portfolio's 14.2% and pure equity's 26.2% — a seven-fold reduction in downside relative to the simplest competing rule. In the 2024 stimulus-driven rally, ERC participated for 10.5% versus equal weight's 28.4%, capturing roughly 37% of the upside, consistent with its 58% risk-asset weight."),
-      tableTitle("Table 6 — Strategy returns by regime (annualised)."),
+      justified("Table 6 splits the OOS window into three distinct regimes defined by CSI 300 price action; the engine begins producing portfolio returns on 2022-12-05, so the 2022 bear-market regime falls outside the realised OOS window and is not reported. During the 2023 sideways/correction regime, when CSI 300 fell 22.6%, ERC delivered a small positive total return of +1.2%, versus −7.3% for equal weight. In the 2024 stimulus-driven rally, ERC participated for 7.9% versus equal weight's 19.3%, capturing roughly 41% of the upside."),
+      tableTitle("Table 6: Strategy total returns by regime."),
       makeTable(
-        ["Regime", "Period", "CSI 300", "ERC", "Equal", "MARP rep"],
+        ["Regime", "Period", "CSI 300", "ERC (5%)", "Equal", "MARP rep"],
         [
-          ["2022 Bear", "Jan–Oct 2022", "−26.2%", "−2.0%", "−14.2%", "−5.1%"],
-          ["2022 Q4 Relief", "Nov 2022–Jan 2023", "+15.8%", "+6.5%", "+18.5%", "+13.8%"],
-          ["2023 Sideways", "Feb 2023–Jan 2024", "−13.4%", "+1.2%", "−2.3%", "+1.7%"],
-          ["2024 Rally", "Feb–Oct 2024", "+32.1%", "+10.5%", "+28.4%", "+24.1%"],
-          ["2024–25 Consolid.", "Oct 2024–Dec 2025", "+5.8%", "+5.7%", "+10.5%", "+12.3%"],
+          ["2023 Sideways", "Feb 2023–Jan 2024", "−22.6%", "+1.2%", "−7.3%", "−0.5%"],
+          ["2024 Rally", "Feb–Oct 2024", "+21.0%", "+7.9%", "+19.3%", "+23.1%"],
+          ["2024–25 Consolidation", "Nov 2024–Dec 2025", "+19.0%", "+9.7%", "+25.2%", "+31.7%"],
         ],
-        [1900, 2000, 1500, 1300, 1300, 1146]
+        [2300, 1900, 1300, 1300, 1100, 1846]
       ),
       para("", { after: 80 }),
-      justified("The regime profile is consistent with the central claim of the risk parity literature: the strategy is designed to deliver asymmetric protection — sacrificing upside participation in exchange for reduced downside — and over a complete cycle this asymmetry compounds into superior risk-adjusted performance, which is precisely what Table 3 documents."),
+      justified("The regime profile is consistent with the central claim of the risk parity literature: the strategy is designed to deliver asymmetric protection, sacrificing upside participation in exchange for reduced downside, and over a complete cycle this asymmetry compounds into superior risk-adjusted performance, which is precisely what Table 3 documents."),
 
-      // ── 5. Hedge-Fund Replication Comparison ──────────────────
-      h1("5. Hedge-Fund Replication Comparison"),
-      justified("To place the risk parity construction in dialogue with an alternative paradigm, we implement a Hasanhodzic & Lo (2007)-style factor replication. We construct four factor-mimicking portfolios from the ETF universe — a market factor (50/50 CSI 300 and CSI 500 minus the risk-free rate), a size proxy (long CSI 500, short CSI 300), a bond factor (5Y Treasury minus risk-free), and a gold factor (Gold minus risk-free) — and use them to replicate a synthetic HFRX-style return series via constrained linear regression."),
-      justified("The contrast with ERC is reported in Table 7. The factor-replication portfolio achieves only a 0.58 Sharpe, less than half of ERC's 1.28, with a maximum drawdown of −12.3% versus ERC's −4.9%. The two return streams are correlated at 0.62 — high enough to confirm shared exposure to Chinese asset markets, low enough to confirm that they capture different dimensions of the multi-asset opportunity set. Risk parity targets diversification across asset risk, while factor replication targets the systematic premia that hedge funds harvest; the two are conceptually orthogonal, and the moderate empirical correlation supports this distinction."),
-      tableTitle("Table 7 — Risk parity versus factor-replication portfolios (OOS)."),
-      makeTable(
-        ["Dimension", "ERC (5%)", "Factor replication"],
-        [
-          ["Construction", "Risk-budgeting on five asset ETFs", "Constrained regression on factor-mimicking portfolios"],
-          ["Sharpe ratio", "1.28", "0.58"],
-          ["Max drawdown", "−4.9%", "−12.3%"],
-          ["Realised volatility", "5.24%", "8.7%"],
-          ["Correlation with ERC", "1.00", "0.62"],
-        ],
-        [2700, 3200, 4046]
-      ),
-      para("", { after: 80 }),
-      justified("A natural extension that we leave for future work is a factor-tilted risk-parity hybrid — using ERC for the risk budget allocation and factor replication for the within-sleeve construction — which would potentially combine the diversification of the former with the premia capture of the latter."),
-
-      // ── 6. Robustness ─────────────────────────────────────────
-      h1("6. Robustness"),
-      h2("6.1 Gold Ablation"),
-      justified("The role of gold in 2024–2025 is a topical question for Chinese multi-asset investors given the elevated price level. We re-estimate the ERC strategy on the four-asset universe excluding the gold ETF; Table 8 reports the resulting performance against the full five-asset specification. Removing gold reduces the annualised return from 8.94% to 3.89%, leaves volatility essentially unchanged, deteriorates the Sharpe from 1.28 to 0.34, and worsens the maximum drawdown by 127 bps. The Sharpe deterioration of 0.95 is the single largest sensitivity in the entire study."),
-      tableTitle("Table 8 — Gold ablation, ERC (5%) strategy, OOS."),
+      // 5. Robustness
+      h1("5. Robustness"),
+      h2("5.1 Gold Ablation"),
+      justified("The role of gold in 2024–2025 is a topical question for Chinese multi-asset investors given the elevated price level. We re-estimate the ERC strategy on the four-asset universe excluding the gold ETF; Table 7 reports the resulting performance against the full five-asset specification. Removing gold reduces the annualised return from 6.74% to 4.47%, lowers volatility from 2.56% to 2.25%, deteriorates the Sharpe from 1.77 to 1.01, and worsens the maximum drawdown by 43 bps."),
+      tableTitle("Table 7: Gold ablation, ERC (5%) strategy, OOS."),
       makeTable(
         ["Metric", "With gold", "Without gold", "Δ"],
         [
-          ["Annualised return", "8.94%", "3.89%", "−5.05%"],
-          ["Annualised volatility", "5.24%", "5.01%", "−0.23%"],
-          ["Sharpe ratio", "1.28", "0.34", "−0.95"],
-          ["Maximum drawdown", "−4.93%", "−6.20%", "−1.27%"],
+          ["Annualised return", "6.74%", "4.47%", "−2.27%"],
+          ["Annualised volatility", "2.56%", "2.25%", "−0.31%"],
+          ["Sharpe ratio", "1.77", "1.01", "−0.76"],
+          ["Maximum drawdown", "−1.63%", "−2.06%", "−0.43%"],
         ],
         [3000, 2300, 2300, 2346]
       ),
       para("", { after: 80 }),
-      justified("Decomposing this effect by regime, gold's contribution is concentrated in the 2022 bear market — where its safe-haven characteristics provided positive returns precisely when equities were falling — and in the 2024–2025 rally, where its appreciation alongside equities lifted the cumulative path. The conclusion of the ablation is therefore unambiguous: in a multi-asset portfolio constructed under a risk-parity rule, gold remains a materially valuable diversifier through 2025."),
+      justified("Decomposing this effect by regime, gold's contribution is concentrated in the 2024–2025 rally, where its appreciation alongside equities lifted the cumulative path. The conclusion of the ablation is therefore unambiguous: in a multi-asset portfolio constructed under a risk-parity rule, gold remains a materially valuable diversifier through 2025."),
 
-      h2("6.2 Drawdown Profile"),
+      h2("5.2 Drawdown Profile"),
       justified("Figure 2 displays the OOS drawdown trajectories. ERC and the official CSI MARP exhibit shallow, mean-reverting drawdowns that recover within months; equal weight and MARP replication exhibit deeper, slower recoveries; HRP shows almost no drawdown but at the cost of negligible return. The pattern provides direct visual confirmation that the volatility overlay translates into the desired drawdown control."),
       image(FIG_DD, 470, 192),
-      caption("Figure 2 — Drawdown trajectories, OOS."),
+      caption("Figure 2: Drawdown trajectories, OOS."),
 
-      h2("6.3 Cost Sensitivity and HRP Diagnostic"),
-      justified("Table 9 stress-tests the ERC Sharpe ratio against transaction costs. The strategy remains Sharpe-positive at any realistic cost level for Chinese ETFs (typically 5–10 bps one-way). Even at 100 bps — an order of magnitude above realistic friction — the Sharpe remains at 0.77."),
-      tableTitle("Table 9 — Cost sensitivity, ERC (5%)."),
+      h2("5.3 Cost Sensitivity and HRP Diagnostic"),
+      justified("Table 8 stress-tests the ERC Sharpe ratio against transaction costs, applied as a per-rebalance turnover charge against the gross-of-cost backtest. Because the engine rebalances annually and the realised OOS window contains only two such rebalances, the absolute cost drag is modest: even at 100 bps one-way, an order of magnitude above realistic friction, the Sharpe falls only to 1.59. At realistic Chinese-ETF friction (5–10 bps one-way), the impact is essentially undetectable."),
+      tableTitle("Table 8: Cost sensitivity, ERC (5%)."),
       makeTable(
         ["One-way cost (bps)", "0", "10", "20", "50", "100"],
         [
-          ["Annualised return", "8.94%", "8.68%", "8.42%", "7.58%", "6.25%"],
-          ["Sharpe ratio", "1.28", "1.23", "1.18", "1.02", "0.77"],
+          ["Annualised return", "6.74%", "6.70%", "6.67%", "6.55%", "6.36%"],
+          ["Sharpe", "1.77", "1.76", "1.74", "1.69", "1.59"],
         ],
         [2546, 1500, 1500, 1500, 1500, 1400]
       ),
       para("", { after: 80 }),
-      justified("The HRP underperformance noted in §3 reflects a known property of Ward-linkage clustering on assets with widely heterogeneous volatilities. With the bond ETF at ≈ 2% volatility and equity ETFs at ≈ 20%, the dendrogram concentrates capital in the low-volatility cluster and the recursive inverse-variance step amplifies this concentration further, leaving a portfolio that is unambiguously safe but has very limited risk-asset participation. Standard remedies in the literature — pre-processing with volatility parity prior to clustering, single or complete linkage, or a minimum-variance constraint at each bisection — are not implemented here in order to preserve the integrity of the locked OOS protocol, but all are natural extensions for future research."),
+      justified("The HRP underperformance noted in Section 3 reflects a known property of Ward-linkage clustering on assets with widely heterogeneous volatilities. With the bond ETF at ≈ 2% volatility and equity ETFs at ≈ 20%, the dendrogram concentrates capital in the low-volatility cluster and the recursive inverse-variance step amplifies this concentration further, leaving a portfolio that is unambiguously safe but has very limited risk-asset participation. Standard remedies in the literature, pre-processing with volatility parity prior to clustering, single or complete linkage, or a minimum-variance constraint at each bisection, are not implemented here in order to preserve the integrity of the locked OOS protocol, but all are natural extensions for future research."),
 
-      // ── 7. Limitations ────────────────────────────────────────
-      h1("7. Limitations"),
+      // 6. Limitations
+      h1("6. Limitations"),
       justified([
-        { text: "First, " }, { text: "the size factor is proxied by the CSI 500 minus CSI 300 spread, which captures a mid-cap minus large-cap differential rather than a true small-minus-big sort, and the value factor is unavailable from the ETF universe. Constructing canonical Fama–French factors for China would require security-level data from CSMAR, Wind, or RESSET. " },
-        { text: "Second, " }, { text: "five ETFs cannot fully span the CSI MARP constituent universe, which includes international equities, broader fixed-income exposures, and several commodity sub-classes. The broad commodity ETF (159980) only begins trading in late 2019, which materially limits early-sample diversification. " },
-        { text: "Third, " }, { text: "the framework is unlevered by construction; when the natural volatility of an inverse-volatility or HRP portfolio falls below the 5% target, the unlevered constraint binds and the target cannot be reached. The official CSI MARP almost certainly uses modest leverage to achieve its target from low-volatility constituents." },
-      ]),
-      justified([
-        { text: "Fourth, " }, { text: "the risk-free rate is held constant at 2.2% per annum; in reality, Chinese deposit rates varied between roughly 1.5% and 3.5% over the sample, and modelling this time variation would refine both the cash leg returns and the Sharpe estimates. " },
-        { text: "Fifth, " }, { text: "transaction costs are modelled as a constant 10 bps round-trip; in practice, costs vary with ETF liquidity, order size, and market conditions, although the cost stress test in §6.3 indicates that this assumption is not material for the headline conclusion. " },
-        { text: "Sixth, " }, { text: "all ETFs in the universe survived to the end of the sample, so survivorship bias is not modelled; this is a minor concern for the established broad-market ETFs used here but would be a serious issue if the universe were extended to thematic or sector products." },
+        { text: "First, ", italics: true },
+        { text: "the size factor is proxied by the spread between the CSI 500 ETF and the CSI 300 ETF, which captures a mid-cap minus large-cap differential rather than a true small-minus-big sort, and which uses ETF returns rather than the underlying index returns; the difference is small in practice (a few basis points of tracking error) but should be acknowledged. The value factor is unavailable from this ETF universe and is omitted entirely. Constructing canonical Fama–French factors for China would require security-level data from CSMAR, Wind, or RESSET. " },
+        { text: "Second, ", italics: true },
+        { text: "five ETFs cannot fully span the CSI MARP constituent universe, which includes international equities, broader fixed-income exposures, and several commodity sub-classes. The broad commodity ETF (159980) only begins trading in late 2019, which materially limits early-sample diversification and pushes the first valid out-of-sample rebalance to December 2022. " },
+        { text: "Third, ", italics: true },
+        { text: "the framework is unlevered by construction; when the natural volatility of an inverse-volatility or HRP portfolio falls below the 5% target, the unlevered constraint binds and the target cannot be reached. " },
+        { text: "Fourth, ", italics: true },
+        { text: "the risk-free rate is held constant at 2.2% per annum; in reality, Chinese deposit rates varied between roughly 1.5% and 3.5% over the sample, and modelling this time variation would refine both the cash leg returns and the Sharpe estimates. " },
+        { text: "Fifth, ", italics: true },
+        { text: "the headline performance metrics are reported gross of transaction costs; the cost-sensitivity stress test in Section 5.3 is run as a separate post-hoc deduction rather than being integrated into the main backtest engine, although the test indicates that this assumption is not material for the headline conclusion. " },
+        { text: "Sixth, ", italics: true },
+        { text: "all ETFs in the universe survived to the end of the sample, so survivorship bias is not modelled; this is a minor concern for the established broad-market ETFs used here but would be a serious issue if the universe were extended to thematic or sector products. We also note that an extension comparing this risk-parity construction with hedge-fund factor-replication portfolios (in the spirit of Hasanhodzic & Lo, 2007) is a natural avenue for future work but was not pursued here, as a defensible comparison would require access to actual hedge-fund index return histories that are not available in our data sources." },
       ]),
 
-      // ── 8. Conclusion ─────────────────────────────────────────
-      h1("8. Conclusion"),
-      justified("We have shown that a tradable five-ETF approximation of the CSI MARP risk-parity construction, implemented under the Equal Risk Contribution rule with a 5% volatility overlay and evaluated under a strict locked-out-of-sample walk-forward protocol, delivers the diversification properties that risk parity promises. Out-of-sample (2022–2025), the strategy produces a Sharpe ratio of 1.28, an annualised return of 8.94% at a realised volatility of 5.24%, and a maximum drawdown of −4.93% — outperforming the equal-weight benchmark on every risk-adjusted metric and approximately matching the official CSI MARP profile while operating exclusively in tradable instruments. The factor regression confirms the strategy is not levered equity exposure (market β = 0.35), the regime decomposition confirms asymmetric protection in the 2022 bear market, and the gold-ablation test identifies gold as the single largest contributor to risk-adjusted performance — which directly answers the project brief's gold-allocation question in the affirmative through 2025. The contrast with a Hasanhodzic–Lo factor replication portfolio shows that risk parity and factor replication capture distinct premia, and a hybrid is a natural avenue for further work. The full pipeline — from data ingestion to weight optimisation to factor regression — runs end-to-end on five liquid Chinese ETFs and is therefore directly implementable for retail and smaller institutional investors who require multi-asset diversification but cannot access the institutional instruments that underlie the official index."),
+      // 7. Conclusion
+      h1("7. Conclusion"),
+      justified("We have shown that a tradable five-ETF approximation of the CSI MARP risk-parity construction, implemented under the Equal Risk Contribution rule with a 5% volatility overlay and evaluated under a strict locked-out-of-sample walk-forward protocol, delivers the diversification properties that risk parity promises. Out-of-sample (Dec 2022 to Dec 2025), the strategy produces a Sharpe ratio of 1.77, an annualised return of 6.74% at a realised volatility of 2.56% (the unlevered constraint binds below the 5% target), and a maximum drawdown of −1.63%, outperforming the equal-weight benchmark on every risk-adjusted metric. The factor regression confirms the strategy is not levered equity exposure (market β = 0.09), the regime decomposition confirms asymmetric protection across the 2023 sideways and 2024 rally regimes, and the gold-ablation test shows the gold leg is a material contributor to risk-adjusted performance, which directly answers the project brief's gold-allocation question in the affirmative through 2025. The full pipeline, from data ingestion to weight optimisation to factor regression, runs end-to-end on five liquid Chinese ETFs and is therefore directly implementable for retail and smaller institutional investors who require multi-asset diversification but cannot access the institutional instruments that underlie the official index."),
 
-      // ── References (incl. data sources) ───────────────────────
+      // References
       h1("References"),
       ...[
         "Hasanhodzic, J., & Lo, A. W. (2007). Can hedge-fund returns be replicated? The linear case. Journal of Investment Management, 5(2), 5–45.",
         "López de Prado, M. (2016). Building diversified portfolios that outperform out of sample. Journal of Portfolio Management, 42(4), 59–69.",
         "Maillard, S., Roncalli, T., & Teïletche, J. (2010). The properties of equally weighted risk contribution portfolios. Journal of Portfolio Management, 36(4), 60–70.",
         "Roncalli, T. (2013). Introduction to Risk Parity and Budgeting. Chapman and Hall/CRC.",
-        "China Securities Index Co., Ltd. (2017). CSI Multi-Asset Risk Parity Index (930929) — Index Methodology. csindex.com.cn.",
+        "China Securities Index Co., Ltd. (2017). CSI Multi-Asset Risk Parity Index (930929), Index Methodology. csindex.com.cn.",
         "China Securities Index Co., Ltd. CSI MARP 930929 and CSI 300 daily index levels, 2017–2025. csindex.com.cn.",
         "East Money. CSI 300 index levels and open-ended fund net asset values, 2017–2025. eastmoney.com.",
         "Yahoo Finance. Adjusted close prices for ETFs 510300.SH, 510500.SH, 511010.SH, 518880.SH, and 159980.SZ, 2017–2025. finance.yahoo.com.",
@@ -459,7 +442,7 @@ const doc = new Document({
   }],
 });
 
-// ── Write ────────────────────────────────────────────────────────
+// Write
 Packer.toBuffer(doc).then(buf => {
   const outPath = path.join(REPORTS_DIR, "report.docx");
   fs.writeFileSync(outPath, buf);

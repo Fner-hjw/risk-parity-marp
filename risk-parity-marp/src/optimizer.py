@@ -71,7 +71,15 @@ def allocate_erc(
         target_rc = rc.mean()
         return float(np.sum((rc - target_rc) ** 2))
 
-    w0 = np.ones(n) / n
+    # Inverse-volatility initial guess: avoids the equal-weight saddle point
+    # where SLSQP can terminate at nit=1 claiming success without moving.
+    vols = returns.std().values * np.sqrt(252)
+    if np.any(vols <= 0) or np.any(~np.isfinite(vols)):
+        w0 = np.ones(n) / n
+    else:
+        inv_vol = 1.0 / vols
+        w0 = inv_vol / inv_vol.sum()
+
     constraints = [{"type": "eq", "fun": lambda w: np.sum(w) - 1.0}]
     bounds = [(0.0, 1.0) for _ in range(n)]  # long only
 
@@ -81,12 +89,15 @@ def allocate_erc(
         method="SLSQP",
         bounds=bounds,
         constraints=constraints,
-        options={"maxiter": 1000, "ftol": 1e-9},
+        options={"maxiter": 2000, "ftol": 1e-12},
     )
 
     if not result.success:
         import warnings
-        warnings.warn(f"ERC optimisation did not converge: {result.message}")
+        warnings.warn(
+            f"ERC optimisation did not converge: {result.message} "
+            f"(nit={result.nit}, fun={result.fun:.3e})"
+        )
 
     w = result.x
 
